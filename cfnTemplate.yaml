@@ -52,6 +52,17 @@ Resources:
               /etc/apt/sources.list.d/jenkins.list'
           sudo apt-get update
           sudo apt-get install jenkins -y 
+          
+          # Install Docker
+          sudo apt-get install docker.io -y
+          sudo systemctl start docker
+          
+          # Install Maven
+          sudo apt-get install maven -y
+
+          # To get the Jenkins initialAdminPassword
+          sudo cp /var/lib/jenkins/secrets/initialAdminPassword /home/ubuntu/
+          sudo chmod 777 /home/ubuntu/initialAdminPassword
 
 Outputs:
   JenkinsServerURL:
@@ -59,3 +70,10 @@ Outputs:
     Value: !Sub
       - http://${publicip}:8080/
       - { publicip: !GetAtt JenkinsInstance.PublicIp } 
+
+  Command:
+    Description: Command to get Jenkins Initial Password for Mac Users
+    Value: !Sub
+      - scp -i ${kName}.pem ubuntu@${publicip}:/home/ubuntu/initialAdminPassword .
+      -  kName: !Ref keyName  
+         publicip: !GetAtt JenkinsInstance.PublicIp  
